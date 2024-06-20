@@ -12,6 +12,10 @@ export const articleCategoryListService = ()=>{
 export const articleCategoryAddService = (categoryData)=>{
     return request.post('/category',categoryData)
 }
+export const articleCategoryDetailService = (id)=>{
+    return request.get('/category/detail?id='+id)
+
+}
 
 //文章分类修改
 export const articleCategoryUpdateService = (categoryData)=>{
@@ -27,6 +31,7 @@ export const articleCategoryDeleteService = (id)=>{
 export const articleListService = (params)=>{
    return  request.get('/article',{params:params})
 }
+
 
 //文章添加
 export const articleAddService = (articleData)=>{
@@ -47,4 +52,8 @@ export const articleUpdateService = (articleData)=>{
 //文章详情获取
 export const articleDetailService = (id)=>{
     return request.get(`/article/detail?id=${id}`);
+}
+
+export const allArticleListService = (params)=>{
+    return request.get(`/article/alllist`,{params:params});
 }

@@ -7,14 +7,14 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
 import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref, toRaw, watch} from 'vue'
+import {ref, toRaw, watch} from 'vue'
 import {
   articleCategoryListService,
   articleListService,
   articleAddService,
   articleDeleteService, articleUpdateService, articleDetailService,
+  allArticleListService
 } from '@/api/article.js'
-
 
 
 //文章分类数据模型
@@ -112,7 +112,7 @@ const articleList = async () => {
     categoryId: categoryId.value ? categoryId.value : null,
     state: state.value ? state.value : null
   }
-  let result = await articleListService(params);
+  let result = await allArticleListService(params);
 
   //渲染视图
   total.value = result.data.total;
@@ -148,9 +148,6 @@ const defaultArticleModel = {
   content: '',
   state: ''
 }
-
-
-
 
 
 //导入token
@@ -247,10 +244,9 @@ const getArticleDetail = async (id) => {
 
 const handleClickArticle = (row) => {
   console.log(row)
-  console.log(row.id)
+  console.log(row.categoryName)
   router.push('/article/detail/' + row.id)
 }
-
 
 
 </script>

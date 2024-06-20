@@ -7,7 +7,8 @@ import {
   Crop,
   EditPen,
   SwitchButton,
-  CaretBottom
+  CaretBottom,
+  Notebook
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 
@@ -81,7 +82,11 @@ const handleCommand = (command) => {
       <!-- element-plus的菜单标签 -->
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/article/category" v-if="userInfoStore.isAdmin">
+        <el-menu-item index="/user/manage" v-if="tokenStore.isAdmin===2">
+          <el-icon><User /></el-icon>
+          <span>用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/article/category" v-if="tokenStore.isAdmin===2">
           <el-icon>
             <Management/>
           </el-icon>
@@ -95,7 +100,7 @@ const handleCommand = (command) => {
         </el-menu-item>
         <el-menu-item index="/article/check">
           <el-icon>
-            <Promotion/>
+            <Notebook/>
           </el-icon>
           <span>文章查看</span>
         </el-menu-item>

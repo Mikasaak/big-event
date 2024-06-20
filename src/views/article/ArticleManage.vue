@@ -12,35 +12,15 @@ import {
   articleCategoryListService,
   articleListService,
   articleAddService,
-  articleDeleteService, articleUpdateService, articleDetailService,
+  articleDeleteService, articleUpdateService, articleDetailService, allArticleListService,
 } from '@/api/article.js'
+import {useTokenStore} from '@/stores';
 
+const tokenStore = useTokenStore();
 
 
 //文章分类数据模型
-const categorys = ref([
-  {
-    "id": 3,
-    "categoryName": "美食",
-    "categoryAlias": "my",
-    "createTime": "2023-09-02 12:06:59",
-    "updateTime": "2023-09-02 12:06:59"
-  },
-  {
-    "id": 4,
-    "categoryName": "娱乐",
-    "categoryAlias": "yl",
-    "createTime": "2023-09-02 12:08:16",
-    "updateTime": "2023-09-02 12:08:16"
-  },
-  {
-    "id": 5,
-    "categoryName": "军事",
-    "categoryAlias": "js",
-    "createTime": "2023-09-02 12:08:33",
-    "updateTime": "2023-09-02 12:08:33"
-  }
-])
+const categorys = ref([])
 
 //用户搜索时选中的分类id
 const categoryId = ref('')
@@ -49,38 +29,7 @@ const categoryId = ref('')
 const state = ref('')
 
 //文章列表数据模型
-const articles = ref([
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-])
+const articles = ref([])
 
 //分页条数据模型
 const pageNum = ref(1)//当前页
@@ -116,7 +65,14 @@ const articleList = async () => {
     categoryId: categoryId.value ? categoryId.value : null,
     state: state.value ? state.value : null
   }
-  let result = await articleListService(params);
+  let result
+  if (tokenStore.isAdmin===2) {
+    result =  await allArticleListService(params);
+  }
+  else {
+    result = await articleListService(params);
+  }
+  console.log(result.data)
 
   //渲染视图
   total.value = result.data.total;
@@ -168,9 +124,7 @@ const myQuillEditor = ref(null)
 
 
 //导入token
-import {useTokenStore} from '@/stores';
 
-const tokenStore = useTokenStore();
 
 //上传成功的回调函数
 const uploadSuccess = (result) => {
@@ -271,7 +225,7 @@ const handleAddArticle = () => {
       <div class="header">
         <span>文章管理</span>
         <div class="extra">
-          <el-button type="primary" @click="handleAddArticle">添加文章</el-button>
+          <el-button type="primary" @click="handleAddArticle" v-if="tokenStore.isAdmin!==2">添加文章</el-button>
         </div>
       </div>
     </template>
@@ -303,7 +257,7 @@ const handleAddArticle = () => {
       <el-table-column label="状态" prop="state"></el-table-column>
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
-          <el-button :icon="Edit" circle plain type="primary" @click="getArticleDetail(row.id)"></el-button>
+          <el-button :icon="Edit" circle plain type="primary" @click="getArticleDetail(row.id)" v-if="tokenStore.isAdmin!==2"></el-button>
           <el-button :icon="Delete" circle plain type="danger" @click="deleteArticle(row.id)"></el-button>
         </template>
       </el-table-column>

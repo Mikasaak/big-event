@@ -71,7 +71,9 @@ const login =async ()=>{
    //alert(result.msg? result.msg : '登录成功')
    ElMessage.success(result.msg ? result.msg : '登录成功')
    //把得到的token存储到pinia中
-   tokenStore.setToken(result.data)
+   tokenStore.setToken(result.data.token)
+  tokenStore.setAdmin(result.data.status)
+
    //跳转到首页 路由完成跳转
    router.push('/')
 }
