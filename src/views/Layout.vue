@@ -164,7 +164,7 @@ const handleCommand = (command) => {
         <router-view></router-view>
       </el-main>
       <!-- 底部区域 -->
-      <el-footer>大事件 文章发布管理系统 ©2023</el-footer>
+      <el-footer>大事件 文章发布管理系统 ©2024</el-footer>
     </el-container>
   </el-container>
 </template>
