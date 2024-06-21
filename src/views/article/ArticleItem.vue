@@ -3,22 +3,23 @@ import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {articleCategoryDetailService, articleDetailService} from "@/api/article";
 
+//文章分类管理
 
 const router = useRouter()
 
 const articleInfo = ref({})
 onMounted(async () => {
   let id = router.currentRoute.value.params.id
-  //调用接口
+  //调用获取文章详情接口
   let result = await articleDetailService(id);
   articleInfo.value = result.data;
+
+  //获取文章分类名字
   let categoryId = result.data.categoryId
   let CategoryResult = await articleCategoryDetailService(categoryId);
   articleInfo.value.categoryName = CategoryResult.data.categoryName;
 
 })
-
-
 </script>
 
 <template>

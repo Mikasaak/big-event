@@ -54,6 +54,7 @@ export const articleDetailService = (id)=>{
     return request.get(`/article/detail?id=${id}`);
 }
 
+//全部文章列表查询
 export const allArticleListService = (params)=>{
     return request.get(`/article/alllist`,{params:params});
 }

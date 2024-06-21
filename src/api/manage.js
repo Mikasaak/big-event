@@ -10,7 +10,7 @@ export const userAddService = (registerData)=>{
     for(let key in registerData){
         params.append(key,registerData[key]);
     }
-    return request.post('/user/register',params);
+    return request.post('/enter/register',params);
 }
 //用户删除
 export const userDeleteService = (id)=>{

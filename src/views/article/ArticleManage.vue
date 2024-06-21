@@ -7,7 +7,7 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
 import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref, toRaw, watch} from 'vue'
+import {ref, toRaw, watch} from 'vue'
 import {
   articleCategoryListService,
   articleListService,
@@ -66,10 +66,9 @@ const articleList = async () => {
     state: state.value ? state.value : null
   }
   let result
-  if (tokenStore.isAdmin===2) {
-    result =  await allArticleListService(params);
-  }
-  else {
+  if (tokenStore.isAdmin === 2) {
+    result = await allArticleListService(params);
+  } else {
     result = await articleListService(params);
   }
   console.log(result.data)
@@ -114,13 +113,28 @@ const defaultArticleModel = {
 }
 
 
+const rules = {
+  title: [
+    {required: true, message: '请输入文章标题', trigger: 'blur'},
+  ],
+  categoryId: [
+    {required: true, message: '请选择文章分类', trigger: 'change'},
+  ],
+  coverImg: [
+    {required: true, message: '请上传文章封面', trigger: 'change'},
+  ],
+  content: [
+    {required: true, message: '请输入文章内容', trigger: 'blur'},
+  ],
+
+}
+
 
 const myQuillEditor = ref(null)
 
 // watch(() => articleModel.value, (val) => {
 //   toRaw(myQuillEditor.value).setHTML(val.content)
 // }, { deep: true })
-
 
 
 //导入token
@@ -134,29 +148,38 @@ const uploadSuccess = (result) => {
 
 //添加文章
 
+const articleForm = ref(null)
 
 const addArticle = async (clickState) => {
   //把发布状态赋值给数据模型
   isArticleUpdate.value = false;
   articleModel.value.state = clickState;
   //调用接口
-  let result = await articleAddService(articleModel.value);
-  ElMessage.success(result.msg ? result.msg : '添加成功');
-  articleModel.value = {
-    ...defaultArticleModel,
-    state: clickState
-  }
-  //让抽屉消失
-  visibleDrawer.value = false;
+  await articleForm.value.validate(async (valid) => {
+    console.log(valid)
+    if (!valid) {
+      ElMessage.error('请检查表单数据')
+    }
+    else {
+      let result = await articleAddService(articleModel.value);
+      ElMessage.success(result.msg ? result.msg : '添加成功');
+      articleModel.value = {
+        ...defaultArticleModel,
+        state: clickState
+      }
+      //让抽屉消失
+      visibleDrawer.value = false;
 
-  //刷新当前列表
-  articleList()
+      //刷新当前列表
+      articleList()
+    }
+  })
 }
 const deleteArticle = (id) => {
   //提示用户  确认框
 
   ElMessageBox.confirm(
-      '你确认要删除该分类信息吗?',
+      '你确认要删除该文章信息吗?',
       '温馨提示',
       {
         confirmButtonText: '确认',
@@ -257,7 +280,8 @@ const handleAddArticle = () => {
       <el-table-column label="状态" prop="state"></el-table-column>
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
-          <el-button :icon="Edit" circle plain type="primary" @click="getArticleDetail(row.id)" v-if="tokenStore.isAdmin!==2"></el-button>
+          <el-button :icon="Edit" circle plain type="primary" @click="getArticleDetail(row.id)"
+                     v-if="tokenStore.isAdmin!==2"></el-button>
           <el-button :icon="Delete" circle plain type="danger" @click="deleteArticle(row.id)"></el-button>
         </template>
       </el-table-column>
@@ -274,17 +298,17 @@ const handleAddArticle = () => {
     <!-- 抽屉 -->
     <el-drawer v-model="visibleDrawer" :title="isArticleUpdate?'编辑文章':'添加文章'" direction="rtl" size="50%">
       <!-- 添加文章表单 -->
-      <el-form :model="articleModel" label-width="100px">
-        <el-form-item label="文章标题">
+      <el-form :model="articleModel" label-width="100px" ref="articleForm" :rules="rules">
+        <el-form-item label="文章标题" prop="title">
           <el-input v-model="articleModel.title" placeholder="请输入标题"></el-input>
         </el-form-item>
-        <el-form-item label="文章分类">
+        <el-form-item label="文章分类" prop="categoryId">
           <el-select placeholder="请选择" v-model="articleModel.categoryId">
             <el-option v-for="c in categorys" :key="c.id" :label="c.categoryName" :value="c.id">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="文章封面">
+        <el-form-item label="文章封面" prop="coverImg">
 
           <!--
               auto-upload:设置是否自动上传
@@ -306,7 +330,7 @@ const handleAddArticle = () => {
             </el-icon>
           </el-upload>
         </el-form-item>
-        <el-form-item label="文章内容">
+        <el-form-item label="文章内容" prop="content">
           <div class="editor">
             <QuillEditor ref="myQuillEditor" theme="snow" v-model:content="articleModel.content" contentType="html">
             </QuillEditor>

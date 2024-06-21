@@ -4,6 +4,7 @@ import {
     Delete
 } from '@element-plus/icons-vue'
 import { ref } from 'vue'
+//文章分类数据列表
 const categorys = ref([
     // {
     //     "id": 3,
@@ -12,27 +13,12 @@ const categorys = ref([
     //     "createTime": "2023-09-02 12:06:59",
     //     "updateTime": "2023-09-02 12:06:59"
     // },
-    // {
-    //     "id": 4,
-    //     "categoryName": "娱乐",
-    //     "categoryAlias": "yl",
-    //     "createTime": "2023-09-02 12:08:16",
-    //     "updateTime": "2023-09-02 12:08:16"
-    // },
-    // {
-    //     "id": 5,
-    //     "categoryName": "军事",
-    //     "categoryAlias": "js",
-    //     "createTime": "2023-09-02 12:08:33",
-    //     "updateTime": "2023-09-02 12:08:33"
-    // }
 ])
 //声明一个异步的函数
 import { articleCategoryListService, articleCategoryAddService, articleCategoryUpdateService,articleCategoryDeleteService } from '@/api/article.js'
 const articleCategoryList = async () => {
     let result = await articleCategoryListService();
     categorys.value = result.data;
-
 }
 articleCategoryList();
 //控制添加分类弹窗
@@ -56,7 +42,14 @@ const rules = {
 
 //调用接口,添加表单
 import { ElMessage } from 'element-plus'
+
+const categoryForm = ref(null)
 const addCategory = async () => {
+  categoryForm.value.validate(async (valid) => {
+    if (!valid) {
+      ElMessage.error('请检查表单数据')
+      return
+    }
     //调用接口
     let result = await articleCategoryAddService(categoryModel.value);
     ElMessage.success(result.msg ? result.msg : '添加成功')
@@ -64,6 +57,7 @@ const addCategory = async () => {
     //调用获取所有文章分类的函数
     articleCategoryList();
     dialogVisible.value = false;
+  })
 }
 
 //定义变量,控制标题的展示
@@ -79,18 +73,25 @@ const showDialog = (row) => {
     categoryModel.value.id = row.id
 }
 
+
+
 //编辑分类
 const updateCategory = async () => {
+  categoryForm.value.validate(async (valid) => {
+
+    if (!valid) {
+      ElMessage.error('请检查表单数据')
+      return
+    }
     //调用接口
     let result = await articleCategoryUpdateService(categoryModel.value);
-
     ElMessage.success(result.msg ? result.msg : '修改成功')
-
     //调用获取所有分类的函数
     articleCategoryList();
 
     //隐藏弹窗
     dialogVisible.value = false;
+  })
 }
 
 //清空模型的数据
@@ -158,7 +159,7 @@ const deleteCategory = (row) => {
 
         <!-- 添加分类弹窗 -->
         <el-dialog v-model="dialogVisible" :title="title" width="30%">
-            <el-form :model="categoryModel" :rules="rules" label-width="100px" style="padding-right: 30px">
+            <el-form :model="categoryModel" :rules="rules" label-width="100px" style="padding-right: 30px" ref="categoryForm">
                 <el-form-item label="分类名称" prop="categoryName">
                     <el-input v-model="categoryModel.categoryName" minlength="1" maxlength="10"></el-input>
                 </el-form-item>

@@ -1,13 +1,7 @@
 <script setup>
-import {
-  Edit,
-  Delete
-} from '@element-plus/icons-vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {Plus} from '@element-plus/icons-vue'
-import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import {ref, toRaw, watch} from 'vue'
+import {ref} from 'vue'
 import {
   articleCategoryListService,
   articleListService,
@@ -15,9 +9,13 @@ import {
   articleDeleteService, articleUpdateService, articleDetailService,
   allArticleListService
 } from '@/api/article.js'
+import {useTokenStore} from '@/stores';
+import router from "@/router";
+
+//文章浏览组件
 
 
-//文章分类数据模型
+//文章分类数据列表
 const categorys = ref([
   {
     "id": 3,
@@ -26,20 +24,6 @@ const categorys = ref([
     "createTime": "2023-09-02 12:06:59",
     "updateTime": "2023-09-02 12:06:59"
   },
-  {
-    "id": 4,
-    "categoryName": "娱乐",
-    "categoryAlias": "yl",
-    "createTime": "2023-09-02 12:08:16",
-    "updateTime": "2023-09-02 12:08:16"
-  },
-  {
-    "id": 5,
-    "categoryName": "军事",
-    "categoryAlias": "js",
-    "createTime": "2023-09-02 12:08:33",
-    "updateTime": "2023-09-02 12:08:33"
-  }
 ])
 
 //用户搜索时选中的分类id
@@ -48,28 +32,9 @@ const categoryId = ref('')
 //用户搜索时选中的发布状态
 const state = ref('')
 
+
 //文章列表数据模型
 const articles = ref([
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
-  // {
-  //   "id": 5,
-  //   "title": "陕西旅游攻略",
-  //   "content": "兵马俑,华清池,法门寺,华山...爱去哪去哪...",
-  //   "coverImg": "https://big-event-gwd.oss-cn-beijing.aliyuncs.com/9bf1cf5b-1420-4c1b-91ad-e0f4631cbed4.png",
-  //   "state": "草稿",
-  //   "categoryId": 2,
-  //   "createTime": "2023-09-03 11:55:30",
-  //   "updateTime": "2023-09-03 11:55:30"
-  // },
   // {
   //   "id": 5,
   //   "title": "陕西旅游攻略",
@@ -112,6 +77,7 @@ const articleList = async () => {
     categoryId: categoryId.value ? categoryId.value : null,
     state: state.value ? state.value : null
   }
+  //发送获取全部文章请求
   let result = await allArticleListService(params);
 
   //渲染视图
@@ -151,10 +117,9 @@ const defaultArticleModel = {
 
 
 //导入token
-import {useTokenStore} from '@/stores';
-import router from "@/router";
 
-const tokenStore = useTokenStore();
+
+// const tokenStore = useTokenStore();
 
 //上传成功的回调函数
 const uploadSuccess = (result) => {
@@ -165,83 +130,56 @@ const uploadSuccess = (result) => {
 //添加文章
 
 
-const addArticle = async (clickState) => {
-  //把发布状态赋值给数据模型
-  isArticleUpdate.value = false;
+// const addArticle = async (clickState) => {
+//   //把发布状态赋值给数据模型
+//   isArticleUpdate.value = false;
+//
+//   articleModel.value = {
+//     ...defaultArticleModel,
+//     state: clickState
+//   }
+//   //调用接口
+//   let result = await articleAddService(articleModel.value);
+//
+//   ElMessage.success(result.msg ? result.msg : '添加成功');
+//
+//   //让抽屉消失
+//   visibleDrawer.value = false;
+//
+//   //刷新当前列表
+//   articleList()
+// }
+// const deleteArticle = (id) => {
+//   //提示用户  确认框
+//
+//   ElMessageBox.confirm(
+//       '你确认要删除该分类信息吗?',
+//       '温馨提示',
+//       {
+//         confirmButtonText: '确认',
+//         cancelButtonText: '取消',
+//         type: 'warning',
+//       }
+//   )
+//       .then(async () => {
+//         //调用接口
+//         let result = await articleDeleteService(id);
+//         ElMessage({
+//           type: 'success',
+//           message: '删除成功',
+//         })
+//         //刷新列表
+//         articleList()
+//       })
+//       .catch(() => {
+//         ElMessage({
+//           type: 'info',
+//           message: '用户取消了删除',
+//         })
+//       })
+// }
 
-  articleModel.value = {
-    ...defaultArticleModel,
-    state: clickState
-  }
-  //调用接口
-  let result = await articleAddService(articleModel.value);
-
-  ElMessage.success(result.msg ? result.msg : '添加成功');
-
-  //让抽屉消失
-  visibleDrawer.value = false;
-
-  //刷新当前列表
-  articleList()
-}
-const deleteArticle = (id) => {
-  //提示用户  确认框
-
-  ElMessageBox.confirm(
-      '你确认要删除该分类信息吗?',
-      '温馨提示',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
-  )
-      .then(async () => {
-        //调用接口
-        let result = await articleDeleteService(id);
-        ElMessage({
-          type: 'success',
-          message: '删除成功',
-        })
-        //刷新列表
-        articleList()
-      })
-      .catch(() => {
-        ElMessage({
-          type: 'info',
-          message: '用户取消了删除',
-        })
-      })
-}
-
-//编辑文章
-const editorArticle = async () => {
-  //调用接口
-  isArticleUpdate.value = false;
-
-  let result = await articleUpdateService(articleModel.value);
-  ElMessage.success(result.msg ? result.msg : '修改成功');
-  //让抽屉消失
-  visibleDrawer.value = false;
-
-  //刷新当前列表
-  articleList()
-}
-
-const getArticleDetail = async (id) => {
-  //调用接口
-  isArticleUpdate.value = true;
-
-  let result = await articleDetailService(id);
-  console.log(result.data)
-  articleModel.value = result.data;
-
-  visibleDrawer.value = true;
-
-}
-
-// const quillEditor = ref(null)
-
+//路由跳转到详情页面
 const handleClickArticle = (row) => {
   console.log(row)
   console.log(row.categoryName)
@@ -300,8 +238,6 @@ const handleClickArticle = (row) => {
                    layout="jumper, total, sizes, prev, pager, next" background :total="total"
                    @size-change="onSizeChange"
                    @current-change="onCurrentChange" style="margin-top: 20px; justify-content: flex-end"/>
-
-    <!-- 抽屉 -->
   </el-card>
 </template>
 
