@@ -2,7 +2,7 @@
 import { User, Lock } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-//控制注册与登录表单的显示， 默认显示注册
+//控制注册与登录表单的显示， 默认显示登录表单
 const isRegister = ref(false)
 //定义数据模型
 const registerData = ref({
@@ -10,6 +10,8 @@ const registerData = ref({
     password: '',
     rePassword: ''
 })
+
+
 
 //校验密码的函数
 const checkRePassword = (rule, value, callback) => {
@@ -51,6 +53,10 @@ const register = async () => {
     } */
     //alert(result.msg ? result.msg : '注册成功');
     ElMessage.success(result.msg ? result.msg : '注册成功')
+  isRegister.value = false;
+    //清空数据模型
+    clearRegisterData();
+
 }
 
 //绑定数据,复用注册表单的数据模型
